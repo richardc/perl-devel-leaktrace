@@ -38,27 +38,34 @@ ok( s/^leaked AV\(.*?\) from -e line 3$//m, 'one AV');
 ok( s/^leaked RV\(.*?\) from -e line 3$//m, 'one RV');
 ok( m/^\n*$/,                               "and that's all" );
 
+
 # programatic interface
-use Data::Dumper;
 use Devel::Peek;
+use Data::Dumper;
 use Devel::LeakTrace;
 $Devel::LeakTrace::quiet = 1;
 Devel::LeakTrace::reset_counters();
 
-my $x = [ 'fish' ];
-for (0) {}
+{
+    my $x;
+    $x = \$x;
+}
 Devel::LeakTrace::stop();
+print "stopped?\n";
+{
+    my $y;
+    $y = \$y;
+}
 
-# should be stopped, so this pie shouldn't show?
+my $foo = { bar => 1, baz => 2 };
+#$foo->{bar}[1] = 'baz';
+#print Dumper $foo;
 
-my $y = [ 'pie' ];
-
-my @used = Devel::LeakTrace::used();
-print Dumper \@used;
+print Dumper [ Devel::LeakTrace::used ];
 
 # hmm, 2 arrays?
-for my $used (@used) {
-    print "$used->{leaked}\n";
-    Dump $used->{leaked};
-}
+#for my $used (@used) {
+#    print "$used->{leaked}\n";
+#    #Dump $used->{leaked};
+#}
 

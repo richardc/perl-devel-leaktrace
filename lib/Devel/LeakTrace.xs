@@ -5,8 +5,6 @@
 
 #include <glib.h>
 
-static int tracing = 1;
-
 typedef struct {
     char *file;
     int line;
@@ -81,10 +79,11 @@ return_me(gpointer key, gpointer value, gpointer user_data) {
     HV *hv;
 
     if (!w->file) return;
+    //if (SvTYPE((SV*) key) == SVt_RV) return;
     hv = newHV();
-    hv_store(hv, "leaked", 6, newRV_inc((SV*) key), 0);
-    hv_store(hv, "file",   4, newSVpv(w->file, 0), 0);
-    hv_store(hv, "line",   4, newSViv(w->line), 0);
+    if ( !hv_store(hv, "leaked", 6, newRV_inc((SV*) key), 0) ) croak( "leaked" );
+    if ( !hv_store(hv, "file",   4, newSVpv(w->file, 0),  0) ) croak( "file" );
+    if ( !hv_store(hv, "line",   4, newSViv(w->line),     0) ) croak( "line" );
     av_push( av, newRV_noinc((SV*) hv) );
 }
 
@@ -106,13 +105,14 @@ note_changes( char *file, int line ) {
 }
 
 /* Now this bit of cargo is a derived from Devel::Caller */
+static int tracing = 1;
 
 static
 int
 runops_leakcheck(pTHX) {
-    char *lastfile = 0;
+    char *lastfile = NULL;
     int lastline = 0;
-    IV last_count = 0;
+    IV  last_count = 0;
 
     while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX))) {
         PERL_ASYNC_CHECK();
@@ -121,8 +121,8 @@ runops_leakcheck(pTHX) {
             if (PL_sv_count != last_count) {
 		if (tracing) 
 		    note_changes( lastfile, lastline );
-                last_count = PL_sv_count;
-            }
+		last_count = PL_sv_count;
+	    }
             lastfile = CopFILE(cCOP);
             lastline = CopLINE(cCOP);
         }
