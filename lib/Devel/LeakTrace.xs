@@ -121,11 +121,20 @@ MODULE = Devel::LeakTrace PACKAGE = Devel::LeakTrace
 PROTOTYPES: ENABLE
 
 void
-start_up()
+hook_runops()
   PPCODE:
 {
     note_changes(NULL, 0);
     PL_runops = runops_leakcheck;
+}
+
+void
+reset_counters()
+  PPCODE:
+{
+    if (used) g_hash_table_destroy( used );
+    used = NULL;
+    note_changes(NULL, 0);
 }
 
 void
