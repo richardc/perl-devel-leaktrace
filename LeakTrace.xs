@@ -72,7 +72,8 @@ print_me(gpointer key, gpointer value, gpointer user_data) {
     }
 
     if (w->file) {
-        printf("leaked %s(0x%x) from %s line %d\n", type, w, w->file, w->line);
+        fprintf(stderr, "leaked %s(0x%x) from %s line %d\n", 
+		type, key, w->file, w->line);
     }
 }
 
