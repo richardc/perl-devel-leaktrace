@@ -1,3 +1,7 @@
+0.04 Tuesday 15th July, 2003
+	Port to Module::Build 0.19
+	Couple of speedups in not doing quite as much mallocing - 25% then 2.3%
+
 0.03 Wednesday 7th May, 2003
 	Test suite fixes
 
