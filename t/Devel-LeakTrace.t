@@ -26,8 +26,14 @@ my @foo;
 $foo[0] = \@foo;
 };
 
+#print $_;
 ok( $_, 'leak a reference loop $foo[1] = \@foo' );
-ok( s/^leaked SV\(.*?\) from -e line 2$//m, 'one SV');
+if ($] < 5.008001) { # HACK
+    ok( s/^leaked SV\(.*?\) from -e line 2$//m, 'one SV');
+}
+else {
+    ok( s/^leaked SV\(.*?\) from -e line 3$//m, 'one SV');
+}
 ok( s/^leaked AV\(.*?\) from -e line 3$//m, 'one AV');
 ok( s/^leaked RV\(.*?\) from -e line 3$//m, 'one RV');
 ok( m/^\n*$/,                               "and that's all" );
