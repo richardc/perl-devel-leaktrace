@@ -5,6 +5,7 @@
 
 #include <glib.h>
 
+static int tracing = 1;
 
 typedef struct {
     char *file;
@@ -118,7 +119,8 @@ runops_leakcheck(pTHX) {
 
         if (PL_op->op_type == OP_NEXTSTATE) {
             if (PL_sv_count != last_count) {
-                note_changes( lastfile, lastline );
+		if (tracing) 
+		    note_changes( lastfile, lastline );
                 last_count = PL_sv_count;
             }
             lastfile = CopFILE(cCOP);
@@ -174,3 +176,19 @@ PPCODE:
 	}
     }
 }
+
+
+void
+start()
+CODE:
+{
+    tracing = 1;
+}
+
+void
+stop()
+CODE:
+{
+    tracing = 0;
+}
+

@@ -43,9 +43,16 @@ use Data::Dumper;
 use Devel::Peek;
 use Devel::LeakTrace;
 $Devel::LeakTrace::quiet = 1;
-
 Devel::LeakTrace::reset_counters();
+
 my $x = [ 'fish' ];
+for (0) {}
+Devel::LeakTrace::stop();
+
+# should be stopped, so this pie shouldn't show?
+
+my $y = [ 'pie' ];
+
 my @used = Devel::LeakTrace::used();
 print Dumper \@used;
 
