@@ -71,7 +71,6 @@ print_me(gpointer key, gpointer value, gpointer user_data) {
     }
 }
 
-
 static
 int
 note_changes( char *file, int line ) {
