@@ -46,14 +46,16 @@ implicit BEGIN blocks of C<use> statements.
 
 Elminate dependency on glib
 
-Better docs
+Improve the documentation.
 
-Probably stack backtracing, and clustering of reports if they're from
-a similar stack frame.
+Clustering of reports if they're from the same line.
+
+Stack backtraces to suspect lines.
 
 =head1 AUTHOR
 
-Richard Clamp <richardc@unixbeard.net>
+Richard Clamp <richardc@unixbeard.net> with portions of LeakTrace.xs
+taken from Nick Ing-Simmons' Devel::Leak module.
 
 =head1 COPYRIGHT
 
