@@ -95,12 +95,16 @@ int
 runops_leakcheck(pTHX) {
     char *lastfile = 0;
     int lastline = 0;
+    IV last_count = 0;
 
     while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX))) {
         PERL_ASYNC_CHECK();
 
         if (PL_op->op_type == OP_NEXTSTATE) {
-            note_changes( lastfile, lastline );
+            if (PL_sv_count != last_count) {
+                note_changes( lastfile, lastline );
+                last_count = PL_sv_count;
+            }
             lastfile = CopFILE(cCOP);
             lastline = CopLINE(cCOP);
         }
