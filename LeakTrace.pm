@@ -4,7 +4,7 @@ require 5.006;
 use base 'DynaLoader';
 
 INIT {
-    our $VERSION = 0.01;
+    our $VERSION = 0.03;
     bootstrap Devel::LeakTrace $VERSION;
     start_up();
 }
