@@ -40,20 +40,14 @@ sv_apply_to_used(void *p, used_proc *proc, long n) {
 static
 long
 note_used(void *p, SV* sv, long n) {
-    when *a = p;
-    when *w = NULL;
+    when *old = NULL;
 
-    if (used) w = g_hash_table_lookup( used, sv );
-    if (w) {
-        g_hash_table_remove( used, sv );
+    if (used && (old = g_hash_table_lookup( used, sv ))) {
+	g_hash_table_insert(new_used, sv, old);
+	return n;
     }
-    else {
-        w = malloc(sizeof(when));
-        w->line = a->line;
-        w->file = a->file ? strdup(a->file) : NULL;
-    }
-    if (new_used) g_hash_table_insert(new_used, sv, w);
-    return n + 1;
+    g_hash_table_insert(new_used, sv, p);
+    return 1;
 }
 
 static
@@ -77,27 +71,19 @@ print_me(gpointer key, gpointer value, gpointer user_data) {
     }
 }
 
-static
-void
-free_me(gpointer key, gpointer value, gpointer user_data) {
-    when *w = value;
-    if (w->file) {
-        free(w->file);
-    }
-    free(w);
-}
 
 static
 int
 note_changes( char *file, int line ) {
-    when w;
+    when *w;
     int ret;
 
-    w.line = line;
-    w.file = file;
+    w = malloc(sizeof(when));
+    w->line = line;
+    w->file = file;
     new_used = g_hash_table_new( NULL, NULL );
-    ret = sv_apply_to_used(&w, note_used, 0);
-    if (used) g_hash_table_foreach( used, free_me, NULL );
+    if (!sv_apply_to_used( w, note_used, 0 )) free(w);
+    if (used) g_hash_table_destroy( used );
     used = new_used;
     return ret;
 }
