@@ -1,4 +1,7 @@
 \.svn
+^Build$
+^foo$
+^_build/
 MANIFEST.SKIP
 ~$
 ^Makefile$
