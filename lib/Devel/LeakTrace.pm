@@ -6,6 +6,9 @@ use base 'DynaLoader';
 BEGIN {
     our $VERSION = 0.04;
     bootstrap Devel::LeakTrace $VERSION;
+}
+
+INIT {
     start_up();
 }
 
