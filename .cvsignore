@@ -1,6 +1,7 @@
-LineLeak.bs
-LineLeak.c
-LineLeak.o
+LeakTrace.bs
+LeakTrace.c
+LeakTrace.o
 Makefile
+Makefile.old
 blib
 pm_to_blib
