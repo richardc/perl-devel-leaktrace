@@ -40,9 +40,18 @@ ok( m/^\n*$/,                               "and that's all" );
 
 # programatic interface
 use Data::Dumper;
+use Devel::Peek;
 use Devel::LeakTrace;
 $Devel::LeakTrace::quiet = 1;
 
 Devel::LeakTrace::reset_counters();
 my $x = [ 'fish' ];
-print Dumper Devel::LeakTrace::used();
+my @used = Devel::LeakTrace::used();
+print Dumper \@used;
+
+# hmm, 2 arrays?
+for my $used (@used) {
+    print "$used->{leaked}\n";
+    Dump $used->{leaked};
+}
+
