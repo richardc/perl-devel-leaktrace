@@ -3,6 +3,7 @@ use strict;
 require 5.006;
 use base 'DynaLoader';
 
+our $quiet = 0;
 BEGIN {
     our $VERSION = 0.05;
     bootstrap Devel::LeakTrace $VERSION;
@@ -15,7 +16,7 @@ INIT {
 }
 
 END {
-    show_used();
+    show_used() unless $quiet;
 }
 
 1;

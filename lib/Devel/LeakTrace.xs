@@ -1,3 +1,4 @@
+/* -*- C -*- */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -71,6 +72,22 @@ print_me(gpointer key, gpointer value, gpointer user_data) {
     }
 }
 
+static 
+void 
+return_me(gpointer key, gpointer value, gpointer user_data) {
+    when *w = value;
+    AV *av = user_data;
+    HV *hv;
+
+    if (!w->file) return;
+    hv = newHV();
+    hv_store(hv, "leaked", 6, newRV_inc((SV*) key), 0);
+    hv_store(hv, "file",   4, newSVpv(w->file, 0), 0);
+    hv_store(hv, "line",   4, newSViv(w->line), 0);
+    av_push( av, newRV_noinc((SV*) hv) );
+}
+
+
 static
 int
 note_changes( char *file, int line ) {
@@ -141,4 +158,19 @@ show_used()
 CODE:
 {
     if (used) g_hash_table_foreach( used, print_me, NULL );
+}
+
+void
+used()
+PPCODE:
+{
+    if (used) {
+	AV* av = newAV();
+	int i;
+	g_hash_table_foreach( used, return_me, av );
+	for (i = 0; i <= av_len(av); i++) {
+	    SV **sv = av_fetch(av, i, 0);
+	    XPUSHs(*sv);
+	}
+    }
 }

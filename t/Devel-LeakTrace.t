@@ -37,3 +37,12 @@ else {
 ok( s/^leaked AV\(.*?\) from -e line 3$//m, 'one AV');
 ok( s/^leaked RV\(.*?\) from -e line 3$//m, 'one RV');
 ok( m/^\n*$/,                               "and that's all" );
+
+# programatic interface
+use Data::Dumper;
+use Devel::LeakTrace;
+$Devel::LeakTrace::quiet = 1;
+
+Devel::LeakTrace::reset_counters();
+my $x = [ 'fish' ];
+print Dumper Devel::LeakTrace::used();
