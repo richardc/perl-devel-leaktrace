@@ -125,7 +125,7 @@ runops_leakcheck(pTHX) {
     return 0;
 }
 
-MODULE = Devel::LineLeak PACKAGE = Devel::LineLeak
+MODULE = Devel::LeakTrace PACKAGE = Devel::LeakTrace
 
 PROTOTYPES: ENABLE
 

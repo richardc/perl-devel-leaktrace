@@ -1,5 +1,5 @@
-LineLeak.pm
-LineLeak.xs
+LeakTrace.pm
+LeakTrace.xs
 MANIFEST
 Makefile.PL
-t/Devel-LineLeak.t
+t/Devel-LeakTrace.t
