@@ -44,6 +44,8 @@ implicit BEGIN blocks of C<use> statements.
 
 =head1 TODO
 
+Elminate dependency on glib
+
 Better docs
 
 Probably stack backtracing, and clustering of reports if they're from
@@ -52,6 +54,13 @@ a similar stack frame.
 =head1 AUTHOR
 
 Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2002 Richard Clamp. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

@@ -3,6 +3,6 @@ MANIFEST.SKIP
 ~$
 ^Makefile$
 \.cvsignore
-LineLeak.(c|bs|o)
+LeakTrace.(c|bs|o)
 blib
 pm_to_blib
