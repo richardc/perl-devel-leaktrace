@@ -1,6 +1,7 @@
 lib/Devel/LeakTrace.pm
-LeakTrace.xs
+lib/Devel/LeakTrace.xs
 MANIFEST
+Build.PL
 Makefile.PL
 t/00compile.t
 t/Devel-LeakTrace.t
