@@ -75,14 +75,14 @@ print_me(gpointer key, gpointer value, gpointer user_data) {
 static
 int
 note_changes( char *file, int line ) {
-    when *w;
+    static when *w = NULL;
     int ret;
 
-    w = malloc(sizeof(when));
+    if (!w) w = malloc(sizeof(when));
     w->line = line;
     w->file = file;
     new_used = g_hash_table_new( NULL, NULL );
-    if (!sv_apply_to_used( w, note_used, 0 )) free(w);
+    if (sv_apply_to_used( w, note_used, 0 )) w = NULL;
     if (used) g_hash_table_destroy( used );
     used = new_used;
     return ret;
