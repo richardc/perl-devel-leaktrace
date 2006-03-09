@@ -48,16 +48,7 @@ during BEGIN time.  This is intentional as symbol table aliasing is
 never released before the END times and this is most common in the
 implicit BEGIN blocks of C<use> statements.
 
-=head1 CAVEATS
-
-L<glib|http://developer.gnome.org/doc/API/glib/index.html> is used for
-it's hash manipulation routines to keep state.  This is an external
-dependency that is hoped can be removed, but tuits as yet haven't
-presented themselves.
-
 =head1 TODO
-
-Elminate dependency on glib
 
 Improve the documentation.
 
