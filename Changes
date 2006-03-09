@@ -1,3 +1,9 @@
+HEAD
+	Andy Armstrong rewrote everything.  Now comes with it's own
+	hash library (no more glib dependency) and checks the free
+	list rather than the arenas as it's smaller and so quicker
+	to check.
+
 0.05 Friday 19th September, 2003
 	Fix the INIT/BEGIN thing correctly by adding resetting as an
 	independant action

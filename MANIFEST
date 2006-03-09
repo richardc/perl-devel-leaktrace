@@ -1,5 +1,14 @@
 lib/Devel/LeakTrace.pm
 lib/Devel/LeakTrace.xs
+lib/Devel/support/buffer.c
+lib/Devel/support/buffer.h
+lib/Devel/support/common.h
+lib/Devel/support/hash.c
+lib/Devel/support/hash.h
+lib/Devel/support/list.c
+lib/Devel/support/list.h
+lib/Devel/support/tools.c
+lib/Devel/support/tools.h
 TODO
 META.yml
 README
