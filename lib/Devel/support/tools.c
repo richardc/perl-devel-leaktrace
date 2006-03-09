@@ -7,7 +7,8 @@
 /*#define SANITY */
 
 typedef struct {
-	int	line;
+    int	   line;
+    char*  file;
 } where;
 
 static hash *var_map   = NULL;		/* Maps SV* to location where var was created */
@@ -33,10 +34,10 @@ static void nomem(void) {
 }
 
 static const where *get_where(int line, const char *file) {
-	static int 	  init_done = 0;
-	static hash   *cache 	= NULL;
-	static buffer work;
-	where *w;
+	static int    init_done = 0;
+	static hash   *cache    = NULL;
+	where  buffer;
+	where  *w;
 	int err;
 
 	if (!file) {
@@ -44,37 +45,26 @@ static const where *get_where(int line, const char *file) {
 	}
 
 	if (!init_done) {
-		if (err = buffer_init(&work, 256, 64), ERR_None != err) {
-			nomem();
-		}
 		if (err = hash_new(1000, &cache), ERR_None != err) {
 			nomem();
 		}
 		init_done = 1;
 	}
 	
-	size_t sz = sizeof(where) + strlen(file) + 1;
-	if (err = buffer_ensure(&work, sz), ERR_None != err) {
-		nomem();
-	}
-
-	w = (where *) work.buf;
-	w->line = line;
-	strcpy((char *) (w+1), file);
-	
-	/* Already got it? */
-	if (w = (where *) hash_get(cache, w, sz)) {
+	buffer.line = line;
+	buffer.file = file;
+	if (w = (where *) hash_get(cache, &buffer, sizeof(where))) {
 		return w;
 	}
 	
-	if (w = malloc(sz), !w) {
+	if (w = malloc(sizeof(where)), !w) {
 		nomem();
 	}
 	
-	memcpy(w, work.buf, sz);
+	memcpy(w, &buffer, sizeof(where));
 	
 	/* Add it to cache */
-	if (err = hash_put(cache, w, sz, w), ERR_None != err) {
+	if (err = hash_put(cache, w, sizeof(where), w), ERR_None != err) {
 		nomem();
 	}
 
@@ -85,7 +75,7 @@ static void new_var(SV *sv, const void *p) {
 	int err;
 	const where *w = p;
 	
-	/*fprintf(stderr, "%s, line %d: New var: %p\n", (const char *) (w + 1), w->line, sv); */
+	/*fprintf(stderr, "%s, line %d: New var: %p\n", w->file, w->line, sv); */
 	if (!var_map) {
 		fprintf(stderr, "Oops. var_map == NULL\n");
 		exit(1);
@@ -100,7 +90,7 @@ static void free_var(SV *sv, const void *p) {
 	int err;
 	const where *w = p;
 
-	/*fprintf(stderr, "%s, line %d: Free var: %p\n", (const char *) (w + 1), w->line, sv); */
+	/*fprintf(stderr, "%s, line %d: Free var: %p\n", w->file, w->line, sv); */
 	if (!var_map) {
 		fprintf(stderr, "Oops. var_map == NULL\n");
 		exit(1);
@@ -114,7 +104,7 @@ static void free_var(SV *sv, const void *p) {
 static void new_arena(SV *sva, const void *p) {
 	const where *w = p;
 	int err;
-	/*fprintf(stderr, "%s, line %d: New arena: %p\n", (const char *) (w + 1), w->line, sva); */
+	/*fprintf(stderr, "%s, line %d: New arena: %p\n", w->file, w->line, sva); */
     SV *sv = sva + 1;
     SV *svend = &sva[SvREFCNT(sva)];
 
@@ -133,12 +123,12 @@ static void new_arena(SV *sva, const void *p) {
 		}
         ++sv;
     }
-	/*fprintf(stderr, "%s, line %d: End new arena: %p\n", (const char *) (w + 1), w->line, sva); */
+	/*fprintf(stderr, "%s, line %d: End new arena: %p\n", w->file, w->line, sva); */
 }
 
 static void free_arena(SV *sva, const void *p) {
 	const where *w = p;
-	fprintf(stderr, "%s, line %d: Free arena: %p\n", (const char *) (w + 1), w->line, sva);
+	fprintf(stderr, "%s, line %d: Free arena: %p\n", w->file, w->line, sva);
 	fprintf(stderr, "Don't know what to do when an arena is freed...\n");
 	exit(1);
 }
@@ -228,7 +218,7 @@ static void brute_force(int line, const char *file) {
 					} else {
 						if (w) {
 							fprintf(stderr, "%s, line %d: New var (bf): %p\n",
-							 			(const char *) (w + 1), w->line, sv);
+							 			w->file, w->line, sv);
 						}
 					}
 				}
@@ -352,9 +342,9 @@ void tools_hook_runops(void) {
 static void print_var(SV *sv, const where *w) {
     char *type;
 	
-	if (!w && var_map) {
-		w = hash_get(var_map, &sv, sizeof(sv));
-	}
+    if (!w && var_map) {
+	w = hash_get(var_map, &sv, sizeof(sv));
+    }
 
     switch SvTYPE(sv) {
     case SVt_PVAV:  type = "AV"; break;
@@ -365,13 +355,13 @@ static void print_var(SV *sv, const where *w) {
     default:        type = "SV"; break;
     }
 
-	if (!w) {
+    if (!w) {
         /*fprintf(stderr, "leaked %s(0x%x) from uknown location\n", */
- 		/*		type, sv); */
-	} else {
+	/*		type, sv); */
+    } else {
         fprintf(stderr, "leaked %s(0x%x) from %s line %d\n", 
-				type, sv, (const char *) (w + 1), w->line);
-	}
+		type, sv, w->file, w->line);
+    }
 }
 
 void tools_show_used(void) {
