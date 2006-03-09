@@ -38,14 +38,13 @@ static const where *get_where(int line, const char *file) {
 	static hash   *cache    = NULL;
 	where  buffer;
 	where  *w;
-	int err;
 
 	if (!file) {
 		return NULL;
 	}
 
 	if (!init_done) {
-		if (err = hash_new(1000, &cache), ERR_None != err) {
+		if (hash_new(1000, &cache) != ERR_None) {
 			nomem();
 		}
 		init_done = 1;
@@ -64,7 +63,7 @@ static const where *get_where(int line, const char *file) {
 	memcpy(w, &buffer, sizeof(where));
 	
 	/* Add it to cache */
-	if (err = hash_put(cache, w, sizeof(where), w), ERR_None != err) {
+	if (hash_put(cache, w, sizeof(where), w) != ERR_None) {
 		nomem();
 	}
 
@@ -72,7 +71,6 @@ static const where *get_where(int line, const char *file) {
 }
 
 static void new_var(SV *sv, const void *p) {
-	int err;
 	const where *w = p;
 	
 	/*fprintf(stderr, "%s, line %d: New var: %p\n", w->file, w->line, sv); */
@@ -81,13 +79,12 @@ static void new_var(SV *sv, const void *p) {
 		exit(1);
 	}
 	
-	if (err = hash_put(var_map, &sv, sizeof(sv), (void *) w), ERR_None != err) {
+	if (hash_put(var_map, &sv, sizeof(sv), (void *) w) != ERR_None) {
 		nomem();
 	}
 }
 
 static void free_var(SV *sv, const void *p) {
-	int err;
 	const where *w = p;
 
 	/*fprintf(stderr, "%s, line %d: Free var: %p\n", w->file, w->line, sv); */
@@ -96,14 +93,13 @@ static void free_var(SV *sv, const void *p) {
 		exit(1);
 	}
 	
-	if (err = hash_delete_key(var_map, &sv, sizeof(sv)), ERR_None != err) {
+	if (hash_delete_key(var_map, &sv, sizeof(sv)) != ERR_None) {
 		nomem();
 	}
 }
 
 static void new_arena(SV *sva, const void *p) {
 	const where *w = p;
-	int err;
 	/*fprintf(stderr, "%s, line %d: New arena: %p\n", w->file, w->line, sva); */
     SV *sv = sva + 1;
     SV *svend = &sva[SvREFCNT(sva)];
@@ -117,7 +113,7 @@ static void new_arena(SV *sva, const void *p) {
 			 * when we compare the new free list with the old one it'll look as
 			 * if lots of variables that never existed have been freed.
 			 */
-			if (err = list_append(&current_free, sv), ERR_None != err) {
+			if (list_append(&current_free, sv) != ERR_None) {
 				nomem();
 			}
 		}
@@ -146,7 +142,6 @@ static void in_comp_only(SV *sv, const void *p) {
 static void free_list_sane(void) {
 	list real_free;
 	list comp_free;
-	int err;
 	SV *sva;
 	SV **real_ar;
 	SV **comp_ar;
@@ -154,12 +149,12 @@ static void free_list_sane(void) {
 	size_t real_sz, comp_sz;
 	
 	/* Get the real free list */
-	if (err = list_build(&real_free, PL_sv_root, list_hint(&current_free)), ERR_None != err) {
+	if (list_build(&real_free, PL_sv_root, list_hint(&current_free)) != ERR_None) {
 		nomem();
 	}
 	
 	/* Get the list of all the free SVs in all the arenas */
-	if (err = list_init(&comp_free, list_hint(&real_free)), ERR_None != err) {
+	if (list_init(&comp_free, list_hint(&real_free)) != ERR_None) {
 		nomem();
 	}
 	
@@ -169,7 +164,7 @@ static void free_list_sane(void) {
 
         while (sv < svend) {
             if (free_sv(sv)) {
-				if (err = list_append(&comp_free, sv), ERR_None != err) {
+				if (list_append(&comp_free, sv) != ERR_None) {
 					nomem();
 				}
             }
@@ -193,13 +188,12 @@ static void brute_force(int line, const char *file) {
     SV *sva;
 	hash *baby;
 	const where *w;
-	int err;
 
 	fprintf(stderr, "brute_force(%d, \"%s\")\n", line, file);
 	
 	w = get_where(line, file);
 
-	if (err = hash_new(PL_sv_count, &baby), ERR_None != err) {
+	if (hash_new(PL_sv_count, &baby) != ERR_None) {
 		nomem();
 	}
 
@@ -223,7 +217,7 @@ static void brute_force(int line, const char *file) {
 					}
 				}
 
-				if (err = hash_put(baby, &sv, sizeof(sv), hash_PUTNULL((void *) nw)), ERR_None != err) {
+				if (hash_put(baby, &sv, sizeof(sv), hash_PUTNULL((void *) nw)) != ERR_None) {
 					nomem();
 				}
             }
@@ -241,7 +235,6 @@ static void brute_force(int line, const char *file) {
 static void note_new_vars(int line, const char *file) {
 	list new_arenas;
 	list new_free;
-	int err;
 	const where *w;
 	
 	if (!file) {
@@ -256,11 +249,11 @@ static void note_new_vars(int line, const char *file) {
 
     /*fprintf(stderr, "note_new_vars(%d, \"%s\")\n", line, file); */
 
-	if (err = list_build(&new_arenas, PL_sv_arenaroot, list_hint(&current_arenas)), ERR_None != err) {
+	if (list_build(&new_arenas, PL_sv_arenaroot, list_hint(&current_arenas)) != ERR_None) {
 		nomem();
 	}
 	
-	if (err = list_build(&new_free, PL_sv_root, list_hint(&current_free)), ERR_None != err) {
+	if (list_build(&new_free, PL_sv_root, list_hint(&current_free)) != ERR_None) {
 		nomem();
 	}
 	
@@ -308,14 +301,12 @@ static int runops_leakcheck(pTHX) {
 }
 
 void tools_reset_counters(void) {
-	int err;
-	
 	hash_delete(var_map);
 	var_map = NULL;
 	
 	/*fprintf(stderr, "\nNew var_map\n\n"); */
 	
-	if (err = hash_new(1000, &var_map), ERR_None != err) {
+	if (hash_new(1000, &var_map) != ERR_None) {
 		nomem();
 	}
 
