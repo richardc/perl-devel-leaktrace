@@ -9,12 +9,14 @@ BEGIN {
     hook_runops();
 }
 
+my $i_care;
 INIT {
     reset_counters();
+    $i_care = 1;
 }
 
 END {
-    show_used();
+    show_used() if $i_care;
 }
 
 1;
