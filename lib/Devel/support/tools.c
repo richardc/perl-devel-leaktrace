@@ -284,7 +284,7 @@ static int runops_leakcheck(pTHX) {
         PERL_ASYNC_CHECK();
 
         if (PL_op->op_type == OP_NEXTSTATE) {
-			/*fprintf(stderr, "%s, line %d\n", lastfile, lastline); */
+	    /*fprintf(stderr, "%s, line %d\n", lastfile, lastline); */
             note_new_vars(lastline, lastfile);
 	    brute_force(lastline, lastfile);
             lastfile = CopFILE(cCOP);
