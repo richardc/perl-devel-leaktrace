@@ -1,6 +1,6 @@
 package Devel::LeakTrace;
 use strict;
-require 5.006;
+require 5.008;
 use base 'DynaLoader';
 
 BEGIN {
