@@ -1,3 +1,6 @@
+Build
+_build
+MYMETA.yml
 LeakTrace.bs
 LeakTrace.c
 LeakTrace.o
