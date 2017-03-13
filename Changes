@@ -1,3 +1,9 @@
+0.06 Monday 13th March, 2017
+        Changed dependency from glib to glib-2.0 as glib 1.x has been
+        dropped.
+        Update tests to work on 5.8 and later, setting 5.8 as the
+        earliest supported version.
+
 0.05 Friday 19th September, 2003
 	Fix the INIT/BEGIN thing correctly by adding resetting as an
 	independant action

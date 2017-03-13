@@ -4,7 +4,7 @@ require 5.008;
 use base 'DynaLoader';
 
 BEGIN {
-    our $VERSION = 0.05;
+    our $VERSION = '0.06';
     bootstrap Devel::LeakTrace $VERSION;
     hook_runops();
 }
